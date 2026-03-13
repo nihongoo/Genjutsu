@@ -1,0 +1,38 @@
+# dependencies
+/node_modules
+
+# next build
+/.next
+/out
+*.tsbuildinfo
+next-env.d.ts
+
+# production
+/build
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# env files
+.env*
+!.env.example
+
+# local files
+*.local
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# misc
+coverage
