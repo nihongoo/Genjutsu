@@ -65,7 +65,7 @@ Available commands:
 
     return (
         <div
-            className="bg-black text-red-400 font-mono text-sm h-full w-full p-4 overflow-auto"
+            className="bg-black text-red-400 font-mono text-sm h-full w-full overflow-auto p-1"
             onClick={() => inputRef.current?.focus()}
         >
             {/* History */}
