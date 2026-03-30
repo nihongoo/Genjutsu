@@ -49,7 +49,7 @@ const initialState: OSState = {
   windows: [],
   focusedWindowId: null,
   startMenuOpen: false,
-  nextZIndex: 1,
+  nextZIndex: 36,
   isShutdown: false,
   wallpaper: {
     type: 'video',
