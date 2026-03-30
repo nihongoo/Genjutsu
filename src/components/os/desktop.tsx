@@ -116,7 +116,7 @@ export function Desktop() {
         )}
 
         {/* Desktop Icons - RESPONSIVE VERSION */}
-        <div className="p-4 absolute top-0 left-0 bottom-12 flex flex-col flex-wrap gap-3 z-10 content-start max-h-[calc(100vh-2.5rem)]">
+        <div className="p-4 absolute top-0 left-0 bottom-12 flex flex-col flex-wrap gap-3 z-1 content-start max-h-[calc(100vh-2.5rem)]">
           {APPS_CONFIG.map((item) => (
             <DesktopIcon
               key={item.id}
