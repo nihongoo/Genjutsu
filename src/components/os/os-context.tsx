@@ -3,7 +3,8 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
 import ThisPc from '../../assets/this-pc.png';
 import Commands from '../../assets/commands.png';
-import { th } from 'date-fns/locale';
+import Chrome from '../../assets/Chrome.png';
+import Spotify from '../../assets/Spotify.png';
 import { StaticImageData } from 'next/image';
 
 export interface WindowState {
@@ -48,7 +49,7 @@ const initialState: OSState = {
   windows: [],
   focusedWindowId: null,
   startMenuOpen: false,
-  nextZIndex: 1,
+  nextZIndex: 36,
   isShutdown: false,
   wallpaper: {
     type: 'video',
@@ -103,16 +104,6 @@ function osReducer(state: OSState, action: OSAction): OSState {
           position: { x: 200, y: 180 },
           size: { width: 800, height: 600 },
         },
-        contact: {
-          id: 'contact',
-          title: 'Contact',
-          icon: '✉️',
-          isOpen: true,
-          isMinimized: false,
-          isMaximized: false,
-          position: { x: 250, y: 230 },
-          size: { width: 550, height: 480 },
-        },
         resume: {
           id: 'resume',
           title: 'Resume',
@@ -130,8 +121,28 @@ function osReducer(state: OSState, action: OSAction): OSState {
           isOpen: true,
           isMinimized: false,
           isMaximized: false,
-          position: { x: 300, y: 280 },
+          position: { x: 250, y: 230 },
           size: { width: 650, height: 520 },
+        },
+        chrome: {
+          id: 'chrome',
+          title: 'Chrome',
+          icon: Chrome,
+          isOpen: true,
+          isMinimized: false,
+          isMaximized: false,
+          position: { x: 350, y: 100 },
+          size: { width: 900, height: 650 },
+        },
+        spotify: {
+          id: 'spotify',
+          title: 'Spotify',
+          icon: Spotify, // Or use '🎵'
+          isOpen: true,
+          isMinimized: false,
+          isMaximized: false,
+          position: { x: 400, y: 150 },
+          size: { width: 950, height: 700 },
         },
       };
 
