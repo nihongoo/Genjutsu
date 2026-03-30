@@ -44,7 +44,6 @@ export function Window({
   useEffect(() => {
     const updateFireWidth = () => {
       const width = size.width / 1;
-        console.log('calculated width:', width); 
       setFireWidth(width);
     };
     updateFireWidth();
