@@ -7,9 +7,10 @@ import { Window } from './window';
 import { AboutWindow } from '../windows/about-window';
 import { SkillsWindow } from '../windows/skills-window';
 import { ProjectsWindow } from '../windows/projects-window';
-import { ContactWindow } from '../windows/contact-window';
 import { ResumeWindow } from '../windows/resume-window';
 import { CommandsWindow } from '../windows/command-window';
+import { ChromeWindow } from '../windows/chrome-window';
+import { SpotifyWindow } from '../windows/spotify-window';
 import { VideoWallpaper } from './video-wallpaper';
 import { APPS_CONFIG } from '../../config/apps-config';
 
@@ -17,9 +18,10 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   about: AboutWindow,
   skills: SkillsWindow,
   projects: ProjectsWindow,
-  contact: ContactWindow,
+  chrome: ChromeWindow,
   resume: ResumeWindow,
   commands: CommandsWindow,
+  spotify : SpotifyWindow,
 };
 
 // Predefined wallpapers
@@ -114,7 +116,7 @@ export function Desktop() {
         )}
 
         {/* Desktop Icons - RESPONSIVE VERSION */}
-        <div className="p-4 absolute top-0 left-0 bottom-12 flex flex-col flex-wrap gap-4 z-10 content-start max-h-[calc(100vh-3rem)]">
+        <div className="p-4 absolute top-0 left-0 bottom-12 flex flex-col flex-wrap gap-3 z-10 content-start max-h-[calc(100vh-2.5rem)]">
           {APPS_CONFIG.map((item) => (
             <DesktopIcon
               key={item.id}
