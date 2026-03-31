@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useOS } from './os-context';
 import { DesktopIcon } from './desktop-icon';
 import { Window } from './window';
@@ -21,7 +21,7 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   chrome: ChromeWindow,
   resume: ResumeWindow,
   commands: CommandsWindow,
-  spotify : SpotifyWindow,
+  spotify: SpotifyWindow,
 };
 
 // Predefined wallpapers
@@ -40,6 +40,29 @@ export function Desktop() {
   const { state, dispatch } = useOS();
   const [showWallpaperMenu, setShowWallpaperMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!showWallpaperMenu || !menuRef.current) return;
+
+    const menu = menuRef.current;
+    const { offsetWidth, offsetHeight } = menu;
+
+    let x = menuPosition.x;
+    let y = menuPosition.y;
+
+    if (x + offsetWidth > window.innerWidth) {
+      x = window.innerWidth - offsetWidth - 8;
+    }
+
+    if (y + offsetHeight > window.innerHeight) {
+      y = window.innerHeight - offsetHeight - 8;
+    }
+
+    if (x !== menuPosition.x || y !== menuPosition.y) {
+      setMenuPosition({ x, y });
+    }
+  }, [showWallpaperMenu]);
 
   const handleDesktopClick = () => {
     if (state.startMenuOpen) {
@@ -50,7 +73,33 @@ export function Desktop() {
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    setMenuPosition({ x: e.clientX, y: e.clientY });
+
+    const padding = 8;
+
+    let x = e.clientX;
+    let y = e.clientY;
+
+    // 👉 Lấy size thật của menu
+    const menu = menuRef.current;
+    if (menu) {
+      const { offsetWidth, offsetHeight } = menu;
+
+      // fix tràn phải
+      if (x + offsetWidth > window.innerWidth) {
+        x = x - offsetWidth;
+      }
+
+      // fix tràn dưới
+      if (y + offsetHeight > window.innerHeight) {
+        y = y - offsetHeight;
+      }
+    }
+
+    // fix tràn trái / trên
+    if (x < padding) x = padding;
+    if (y < padding) y = padding;
+
+    setMenuPosition({ x, y });
     setShowWallpaperMenu(true);
   };
 
@@ -154,6 +203,7 @@ export function Desktop() {
       {/* Context Menu */}
       {showWallpaperMenu && (
         <div
+          ref={menuRef}
           className="fixed bg-white/95 dark:bg-[#2a2a2a]/95 backdrop-blur-lg border border-[#d0d0d0] dark:border-[#404040] shadow-2xl rounded-lg overflow-hidden z-[20000] min-w-[280px]"
           style={{
             left: `${menuPosition.x}px`,
@@ -164,28 +214,6 @@ export function Desktop() {
           <div className="py-2">
             <div className="px-4 py-2 text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase">
               Personalize
-            </div>
-
-            {/* Predefined Wallpapers */}
-            <div className="max-h-[400px] overflow-y-auto">
-              {WALLPAPERS.map((wallpaper) => (
-                <button
-                  key={wallpaper.id}
-                  onClick={() => handleWallpaperChange(wallpaper)}
-                  className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 transition-colors"
-                >
-                  <div
-                    className={`w-12 h-8 rounded border border-[#d0d0d0] dark:border-[#404040] bg-gradient-to-br ${wallpaper.gradient}`}
-                  />
-
-                  <span className="text-sm">{wallpaper.name}</span>
-
-                  {state.wallpaper.type === 'gradient' &&
-                    state.wallpaper.value === wallpaper.gradient && (
-                      <span className="ml-auto text-blue-500">✓</span>
-                    )}
-                </button>
-              ))}
             </div>
 
             <div className="border-t border-[#d0d0d0] dark:border-[#404040] my-2" />

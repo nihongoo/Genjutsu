@@ -20,37 +20,32 @@ export function CommandsWindow() {
         let output = '';
 
         switch (args) {
-            case 'help':
+            case 'kinjutsu':
                 output = `
-Available commands:
-- help
-- clear
-- date
-- echo [text]
-- about
+Available kinjutsu:
+- izanagi
+- izanami
+- kotoamatsukami
         `;
                 break;
 
-            case 'date':
-                output = new Date().toString();
+            case 'izanagi':
+                output = 'izanagi is a powerful genjutsu that allows the user to control their own fate by turning illusions into reality. It can be used to escape death or alter the outcome of events.';
                 break;
 
-            case 'about':
-                output = 'This is a custom web OS terminal 😎';
+            case 'izanami':
+                output = 'izanami is a powerful genjutsu that traps the target in an infinite loop of events. It is often used as a last resort to incapacitate an opponent.';
+                break;
+            case 'kotoamatsukami':
+                output = 'kotoamatsukami.';
                 break;
 
-            case 'clear':
+            case 'cls':
                 setHistory([]);
                 return;
 
             default:
-                if (args.startsWith('echo ')) {
-                    output = cmd.slice(5);
-                } else if (args === '') {
-                    output = '';
-                } else {
-                    output = `'${cmd}' is not recognized as a command.`;
-                }
+                output = `kinjutsu not found: ${cmd}`;
         }
 
         setHistory(prev => [...prev, `> ${cmd}`, output]);

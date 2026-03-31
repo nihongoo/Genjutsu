@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.genjutsu.id.vn/
+
+# Sitemaps
+Sitemap: https://www.genjutsu.id.vn/sitemap.xml

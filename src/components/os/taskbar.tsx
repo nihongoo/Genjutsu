@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOS } from './os-context';
 import { Wifi, Volume2, Grid2x2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image, { StaticImageData } from 'next/image';
+import WindowLogo from '../../assets/Window-Logo.png';
 
 // Lazy load FluidFire component
 const FluidFire = dynamic(() => import('../ui/fluid-fire').then(mod => mod.FluidFire), {
@@ -17,6 +18,13 @@ export function Taskbar() {
   const [time, setTime] = useState('');
   const [fireWidth, setFireWidth] = useState(800);
   const [isMounted, setIsMounted] = useState(false);
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{
+    x: number;
+    y?: number;
+    bottom?: number;
+  }>({ x: 0, y: 0 });
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateFireWidth = () => {
@@ -47,6 +55,35 @@ export function Taskbar() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setContextMenuOpen(false);
+      }
+    };
+
+    if (contextMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [contextMenuOpen]);
+
+  const handleCloseAllWindows = () => {
+    // Đóng tất cả windows đang mở
+    state.windows
+      .filter((w) => w.isOpen)
+      .forEach((window) => {
+        dispatch({ type: 'CLOSE_WINDOW', payload: window.id });
+      });
+
+    setContextMenuOpen(false);
+  };
+
+  const openWindows = state.windows.filter((w) => w.isOpen);
+
   const config = {
     config: {
       width: fireWidth,
@@ -72,13 +109,38 @@ export function Taskbar() {
     }
   };
 
-  const openWindows = state.windows.filter((w) => w.isOpen);
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const menuWidth = 280;
+    const menuHeight = 200;
+    const taskbarHeight = 48;
+
+    let x = e.clientX;
+    if (x + menuWidth > window.innerWidth) {
+      x = window.innerWidth - menuWidth - 10;
+    }
+
+    const distanceFromBottom = window.innerHeight - e.clientY;
+
+    if (distanceFromBottom < menuHeight + taskbarHeight) {
+      setMenuPosition({
+        x,
+        bottom: window.innerHeight - e.clientY,
+      });
+    } else {
+      setMenuPosition({
+        x,
+        y: e.clientY,
+      });
+    }
+
+    setContextMenuOpen(true);
+  };
 
   return (
     <>
-      {/* Fire Effect Container - với aspect-ratio để tránh CLS */}
-
-
+      {/* Fire Effect Container */}
       <div
         className="fixed left-0 right-0 pointer-events-none z-[1] bg-transparent"
         style={{
@@ -102,16 +164,24 @@ export function Taskbar() {
         )}
       </div>
 
-
-      {/* Taskbar - với fixed dimensions */}
-      <div className="fixed bottom-0 left-0 right-0 h-12 flex items-center justify-between px-2 z-[9999]">
+      {/* Taskbar */}
+      <div
+        className="fixed bottom-0 left-0 right-0 h-12 flex items-center justify-between px-2 z-[9999]"
+        onContextMenu={handleContextMenu}
+      >
         <div className="flex items-center gap-1">
           <button
             onClick={() => dispatch({ type: 'TOGGLE_START_MENU' })}
             className={`h-10 w-12 flex items-center justify-center hover:bg-white/10 transition ${state.startMenuOpen ? 'bg-white/10' : ''
               }`}
           >
-            <Grid2x2 size={20} className="text-white" />
+            <Image
+              src={WindowLogo}
+              alt="Start"
+              width={27}
+              height={27}
+              className="text-white"
+            />
           </button>
 
           <div className="flex items-center ml-1">
@@ -128,7 +198,6 @@ export function Taskbar() {
                 className={`relative h-10 w-12 flex items-center justify-center hover:bg-white/10 transition`}
                 title={window.title}
               >
-
                 {typeof window.icon === 'object' ? (
                   <Image
                     src={window.icon}
@@ -163,8 +232,52 @@ export function Taskbar() {
             <div>{time || '00:00'}</div>
           </div>
         </div>
-
       </div>
+
+      {/* Context Menu */}
+      {contextMenuOpen && (
+        <div
+          ref={menuRef}
+          className="fixed bg-white/95 dark:bg-[#2a2a2a]/95 backdrop-blur-lg border border-[#d0d0d0] dark:border-[#404040] shadow-2xl rounded-lg overflow-hidden z-[20000] min-w-[280px]"
+          style={{
+            left: `${menuPosition.x}px`,
+            ...(menuPosition.bottom !== undefined
+              ? { bottom: `${menuPosition.bottom}px` }
+              : { top: `${menuPosition.y}px` }
+            ),
+          }}
+        >
+          <div className="py-2">
+            <div className="px-4 py-2 text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase">
+              Taskbar settings
+            </div>
+
+            <button
+              onClick={() => {
+
+                setContextMenuOpen(false);
+              }}
+              className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 transition-colors text-left"
+            >
+              <span className="text-xl">⚙️</span>
+              <span className="text-sm">Taskbar settings</span>
+            </button>
+
+            <div className="border-t border-[#d0d0d0] dark:border-[#404040] my-2" />
+
+            <button
+              onClick={() => {
+                handleCloseAllWindows();
+                setContextMenuOpen(false);
+              }}
+              className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 transition-colors text-left"
+            >
+              <span className="text-xl">❌</span>
+              <span className="text-sm">Close all windows</span>
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -137,7 +137,7 @@ function osReducer(state: OSState, action: OSAction): OSState {
         spotify: {
           id: 'spotify',
           title: 'Spotify',
-          icon: Spotify, // Or use '🎵'
+          icon: Spotify,
           isOpen: true,
           isMinimized: false,
           isMaximized: false,
