@@ -5,6 +5,7 @@ import { X, Minus, Square } from 'lucide-react';
 import { useOS } from './os-context';
 import dynamic from 'next/dynamic';
 import Image, { StaticImageData } from 'next/image';
+import { el } from 'date-fns/locale';
 
 // Lazy load FluidFire
 const FluidFire = dynamic(() => import('../ui/fluid-fire'), {
@@ -22,6 +23,7 @@ interface WindowProps {
   isMinimized: boolean;
   isMaximized: boolean;
   zIndex: number;
+  showFrame: boolean;
 }
 
 export function Window({
@@ -34,6 +36,7 @@ export function Window({
   isMinimized,
   isMaximized,
   zIndex,
+  showFrame,
 }: WindowProps) {
   const { dispatch } = useOS();
   const [fireWidth, setFireWidth] = useState(size.width / 1.8);
@@ -127,86 +130,93 @@ export function Window({
     }
   };
 
-  return (
-    <div
-      style={windowStyle}
-      className="flex flex-col dark:bg-[#2a2a2a] dark:border-[#404040] shadow-lg"
-      onMouseDown={handleMouseDown}
-    >
-      <div
-        className="left-0 right-0 pointer-events-none z-[1]"
-        style={{
-          height: '32px',
-          width: '100%',
-          containIntrinsicSize: '100% 32px',
-        }}
-      >
-        {isMounted && (
-          <div style={{
-            width: '100%',
-            height: '100%',
-            position: 'relative',
-            bottom: 0,
-          }}>
-            <FluidFire
-              {...config.config}
-              interactive={false}
-              backgroundColor='transparent'
-              style={config.style.canvas}
-            />
-          </div>
-        )}
-      </div>
+  if (showFrame == true) {
 
-      {/* Title Bar */}
+
+    return (
       <div
+        style={windowStyle}
+        className="flex flex-col dark:bg-[#2a2a2a] dark:border-[#404040] shadow-lg"
         onMouseDown={handleMouseDown}
-        className="flex bg-blue items-center justify-between h-8 bg-[#d12b58] text-white px-2 cursor-move select-none flex-shrink-0"
       >
-        <div className="flex items-center gap-2 flex-1">
-          {typeof icon === 'object' ? (
-            <Image
-              src={icon}
-              alt=''
-              width={27}
-              height={27}
-              className="pointer-events-none"
-            />
-          ) : (
-            <div className="text-xl select-none">{icon}</div>
+        <div
+          className="left-0 right-0 pointer-events-none z-[1]"
+          style={{
+            height: '32px',
+            width: '100%',
+            containIntrinsicSize: '100% 32px',
+          }}
+        >
+          {isMounted && (
+            <div style={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              bottom: 0,
+            }}>
+              <FluidFire
+                {...config.config}
+                interactive={false}
+                backgroundColor='transparent'
+                style={config.style.canvas}
+              />
+            </div>
           )}
-          <span className="text-sm font-medium">{title}</span>
         </div>
 
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => dispatch({ type: 'MINIMIZE_WINDOW', payload: id })}
-            className="p-1 hover:bg-white/20 active:bg-white/30 transition-colors"
-            title="Minimize"
-          >
-            <Minus size={16} />
-          </button>
-          <button
-            onClick={() => dispatch({ type: 'MAXIMIZE_WINDOW', payload: id })}
-            className="p-1 hover:bg-white/20 active:bg-white/30 transition-colors"
-            title="Maximize"
-          >
-            <Square size={16} />
-          </button>
-          <button
-            onClick={() => dispatch({ type: 'CLOSE_WINDOW', payload: id })}
-            className="p-1 hover:bg-red-500 active:bg-red-600 transition-colors"
-            title="Close"
-          >
-            <X size={16} />
-          </button>
+        {/* Title Bar */}
+        <div
+          onMouseDown={handleMouseDown}
+          className="flex bg-blue items-center justify-between h-8 bg-[#d12b58] text-white px-2 cursor-move select-none flex-shrink-0"
+        >
+          <div className="flex items-center gap-2 pl-10 justify-center flex-1">
+            <span className="text-sm font-medium">{title}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => dispatch({ type: 'MINIMIZE_WINDOW', payload: id })}
+              className="p-1 hover:bg-white/20 active:bg-white/30 transition-colors"
+              title="Minimize"
+            >
+              <Minus size={16} />
+            </button>
+            <button
+              onClick={() => dispatch({ type: 'MAXIMIZE_WINDOW', payload: id })}
+              className="p-1 hover:bg-white/20 active:bg-white/30 transition-colors"
+              title="Maximize"
+            >
+              <Square size={16} />
+            </button>
+            <button
+              onClick={() => dispatch({ type: 'CLOSE_WINDOW', payload: id })}
+              className="p-1 hover:bg-red-500 active:bg-red-600 transition-colors"
+              title="Close"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-auto bg-white/20 backdrop-blur-md dark:bg-[#2a2a2a] text-foreground">
+          {children}
         </div>
       </div>
-
-      {/* Content Area */}
-      <div className="flex-1 overflow-auto bg-white dark:bg-[#2a2a2a] text-foreground">
-        {children}
+    );
+  }
+  else{
+    return (
+      <div
+        style={windowStyle}
+        className="flex flex-col dark:bg-[#2a2a2a] dark:border-[#404040] shadow-lg"
+        onMouseDown={handleMouseDown}
+      >
+        {/* Content Area */}
+        <div className="flex-1 overflow-auto bg-white/20 backdrop-blur-md dark:bg-[#2a2a2a] text-foreground">
+          {children}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }

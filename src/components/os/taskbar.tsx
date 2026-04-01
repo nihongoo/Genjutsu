@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useOS } from './os-context';
+import { Inbox as InboxComponent } from '../ui/inbox'
 import { Wifi, Volume2, Grid2x2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image, { StaticImageData } from 'next/image';
 import WindowLogo from '../../assets/Window-Logo.png';
+import { Inbox } from 'lucide-react';
 
 // Lazy load FluidFire component
 const FluidFire = dynamic(() => import('../ui/fluid-fire').then(mod => mod.FluidFire), {
@@ -18,6 +20,7 @@ export function Taskbar() {
   const [time, setTime] = useState('');
   const [fireWidth, setFireWidth] = useState(800);
   const [isMounted, setIsMounted] = useState(false);
+  const [inboxOpen, setIsInboxOpen] = useState(false);
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{
     x: number;
@@ -212,7 +215,7 @@ export function Taskbar() {
 
                 {/* ACTIVE INDICATOR */}
                 {!window.isMinimized && (
-                  <div className="absolute bottom-0 w-6 h-[3px] bg-[#0078d4] rounded"></div>
+                  <div className="absolute bottom-0 w-6 h-[3px] bg-[#ffffff]/80 rounded"></div>
                 )}
               </button>
             ))}
@@ -231,8 +234,16 @@ export function Taskbar() {
           <div className="px-3 text-xs leading-tight text-right min-w-[3rem]">
             <div>{time || '00:00'}</div>
           </div>
+          <div className="px-2 text-xs leading-tight text-right min-w-[3rem]"
+            onClick={() => setIsInboxOpen(!inboxOpen)}
+          >
+            <Inbox size={16} />
+          </div>
         </div>
       </div>
+
+      {/* inbox */}
+      <InboxComponent visible={inboxOpen} setVisible={setIsInboxOpen} />
 
       {/* Context Menu */}
       {contextMenuOpen && (

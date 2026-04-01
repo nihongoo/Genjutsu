@@ -5,6 +5,8 @@ import ThisPc from '../../assets/this-pc.png';
 import Commands from '../../assets/commands.png';
 import Chrome from '../../assets/Chrome.png';
 import Spotify from '../../assets/Spotify.png';
+import Settings from '../../assets/Setting.svg';
+import Project from '../../assets/Project.png';
 import { StaticImageData } from 'next/image';
 
 export interface WindowState {
@@ -17,6 +19,7 @@ export interface WindowState {
   position: { x: number; y: number };
   size: { width: number; height: number };
   zIndex: number;
+  showFrame?: boolean;
 }
 
 export interface OSState {
@@ -83,36 +86,7 @@ function osReducer(state: OSState, action: OSAction): OSState {
           isMaximized: false,
           position: { x: 100, y: 80 },
           size: { width: 600, height: 500 },
-        },
-        skills: {
-          id: 'skills',
-          title: 'Skills',
-          icon: '⚙️',
-          isOpen: true,
-          isMinimized: false,
-          isMaximized: false,
-          position: { x: 150, y: 130 },
-          size: { width: 700, height: 550 },
-        },
-        projects: {
-          id: 'projects',
-          title: 'Projects',
-          icon: '📁',
-          isOpen: true,
-          isMinimized: false,
-          isMaximized: false,
-          position: { x: 200, y: 180 },
-          size: { width: 800, height: 600 },
-        },
-        resume: {
-          id: 'resume',
-          title: 'Resume',
-          icon: '📄',
-          isOpen: true,
-          isMinimized: false,
-          isMaximized: false,
-          position: { x: 300, y: 280 },
-          size: { width: 650, height: 520 },
+          showFrame: true,
         },
         commands: {
           id: 'commands',
@@ -123,6 +97,18 @@ function osReducer(state: OSState, action: OSAction): OSState {
           isMaximized: false,
           position: { x: 250, y: 230 },
           size: { width: 650, height: 520 },
+          showFrame: true,
+        },
+        projects: {
+          id: 'projects',
+          title: 'Projects',
+          icon: Project,
+          isOpen: true,
+          isMinimized: false,
+          isMaximized: false,
+          position: { x: 200, y: 180 },
+          size: { width: 800, height: 600 },
+          showFrame: true,
         },
         chrome: {
           id: 'chrome',
@@ -133,6 +119,7 @@ function osReducer(state: OSState, action: OSAction): OSState {
           isMaximized: false,
           position: { x: 350, y: 100 },
           size: { width: 900, height: 650 },
+          showFrame: true,
         },
         spotify: {
           id: 'spotify',
@@ -143,6 +130,18 @@ function osReducer(state: OSState, action: OSAction): OSState {
           isMaximized: false,
           position: { x: 400, y: 150 },
           size: { width: 950, height: 700 },
+          showFrame: true,
+        },
+        settings: {
+          id: 'settings',
+          title: 'Settings',
+          icon: Settings,
+          isOpen: true,
+          isMinimized: false,
+          isMaximized: false,
+          position: { x: 400, y: 150 },
+          size: { width: 950, height: 700 },
+          showFrame: true,
         },
       };
 
