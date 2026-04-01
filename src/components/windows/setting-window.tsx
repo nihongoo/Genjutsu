@@ -126,7 +126,7 @@ export function SettingsWindow() {
                   >
                     {wallpaper.type === 'video' ? (
                       <div className="w-full h-full bg-black flex items-center justify-center">
-                        <span className="text-white text-xs">🎥 Video</span>
+                        <span className="text-white text-xs">Default</span>
                       </div>
                     ) : (
                       <div className={`w-full h-full bg-gradient-to-br ${wallpaper.gradient}`} />
@@ -158,7 +158,7 @@ export function SettingsWindow() {
             <div className="pt-6 border-t border-border">
               <h2 className="text-2xl font-semibold text-foreground mb-4">Accent Colors</h2>
               <div className="space-y-4">
-                <div className="p-4 border border-border rounded bg-card">
+                <div className="p-4 border border-border rounded">
                   <h3 className="font-medium text-foreground mb-3">Choose your accent color</h3>
                   <div className="grid grid-cols-8 gap-3">
                     {[
@@ -189,7 +189,7 @@ export function SettingsWindow() {
             {/* Current Wallpaper Info */}
             <div className="pt-6 border-t border-border">
               <h2 className="text-2xl font-semibold text-foreground mb-4">Current Settings</h2>
-              <div className="p-4 border border-border rounded bg-card">
+              <div className="p-4 border border-border rounded">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Wallpaper Type:</span>
@@ -220,7 +220,7 @@ export function SettingsWindow() {
               
               <div className="space-y-4">
                 {/* Dark Mode Toggle */}
-                <div className="p-4 border border-border rounded bg-card">
+                <div className="p-4 border border-border rounded">
                   <div className="flex justify-between items-center">
                     <div>
                       <h3 className="font-medium text-foreground">Dark Mode</h3>
@@ -242,7 +242,7 @@ export function SettingsWindow() {
                 </div>
 
                 {/* Window Info */}
-                <div className="p-4 border border-border rounded bg-card">
+                <div className="p-4 border border-border rounded">
                   <h3 className="font-medium text-foreground mb-3">Window Resolution</h3>
                   <div className="text-sm text-muted-foreground space-y-2">
                     <div className="flex justify-between">
@@ -257,7 +257,7 @@ export function SettingsWindow() {
                 </div>
 
                 {/* Storage Info */}
-                <div className="p-4 border border-border rounded bg-card">
+                <div className="p-4 border border-border rounded">
                   <h3 className="font-medium text-foreground mb-3">Storage (Browser)</h3>
                   <div className="text-sm text-muted-foreground">
                     <p className="mb-2">LocalStorage is being used for:</p>
@@ -295,7 +295,7 @@ export function SettingsWindow() {
                   { label: 'Screen Resolution', value: `${window.screen.width} × ${window.screen.height}` },
                   { label: 'Color Depth', value: `${window.screen.colorDepth}-bit` },
                 ].map((spec) => (
-                  <div key={spec.label} className="p-4 border border-border rounded bg-card">
+                  <div key={spec.label} className="p-4 border border-border rounded">
                     <p className="text-sm text-muted-foreground">{spec.label}</p>
                     <p className="text-foreground font-medium">{spec.value}</p>
                   </div>
@@ -305,7 +305,7 @@ export function SettingsWindow() {
 
             <div className="pt-6 border-t border-border">
               <h2 className="text-2xl font-semibold text-foreground mb-4">Tech Stack</h2>
-              <div className="p-4 border border-border rounded bg-card">
+              <div className="p-4 border border-border rounded">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Framework</p>
@@ -329,7 +329,7 @@ export function SettingsWindow() {
 
             <div className="pt-6 border-t border-border">
               <h2 className="text-2xl font-semibold text-foreground mb-4">Features</h2>
-              <div className="p-4 border border-border rounded bg-card">
+              <div className="p-4 border border-border rounded">
                 <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
                   <li>Windows 10 UI/UX Simulation</li>
                   <li>Draggable & Resizable Windows</li>
@@ -347,7 +347,7 @@ export function SettingsWindow() {
 
             <div className="pt-6 border-t border-border">
               <h2 className="text-2xl font-semibold text-foreground mb-4">Credits</h2>
-              <div className="p-4 border border-border rounded bg-card text-center">
+              <div className="p-4 border border-border rounded text-center">
                 <p className="text-sm text-muted-foreground">
                   Built with ❤️ using Next.js, TypeScript & Tailwind CSS
                 </p>
@@ -365,9 +365,9 @@ export function SettingsWindow() {
   };
 
   return (
-    <div className="h-full w-full flex bg-background">
+    <div className="h-full w-full flex bg-white/20 backdrop-blur-md dark:bg-[#ffffff]/80 border border-border rounded shadow-lg">
       {/* Sidebar */}
-      <div className="w-64 bg-card border-r border-border overflow-y-auto">
+      <div className="w-64 bg-white/60 backdrop-blur-md dark:bg-[#2a2a2a] border-r border-border no-scrollbar overflow-auto">
         <div className="p-4">
           <h1 className="text-xl font-bold text-foreground mb-4">Settings</h1>
           <div className="space-y-1">
@@ -392,7 +392,7 @@ export function SettingsWindow() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 no-scrollbar overflow-auto bg-white/20 backdrop-blur-md dark:bg-[#2a2a2a] text-foreground">
         <div className="p-8 max-w-4xl">
           {renderContent()}
         </div>

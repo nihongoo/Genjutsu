@@ -99,9 +99,9 @@ export function Window({
   const windowStyle = {
     position: 'fixed' as const,
     left: isMaximized ? 0 : `${position.x}px`,
-    top: isMaximized ? 0 : `${position.y}px`,
+    top: isMaximized ? -32 : `${position.y}px`,
     width: isMaximized ? '100%' : `${size.width}px`,
-    height: isMaximized ? `calc(100% - 48px)` : `${size.height}px`,
+    height: isMaximized ? `calc(100% + 32px)` : `${size.height}px`,
     zIndex: zIndex,
   };
 
@@ -136,7 +136,7 @@ export function Window({
     return (
       <div
         style={windowStyle}
-        className="flex flex-col dark:bg-[#2a2a2a] dark:border-[#404040] shadow-lg"
+        className="flex flex-col shadow-lg"
         onMouseDown={handleMouseDown}
       >
         <div
@@ -144,6 +144,7 @@ export function Window({
           style={{
             height: '32px',
             width: '100%',
+            background : 'transparent',
             containIntrinsicSize: '100% 32px',
           }}
         >
@@ -199,7 +200,7 @@ export function Window({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto bg-white/20 backdrop-blur-md dark:bg-[#2a2a2a] text-foreground">
+        <div className="flex-1 overflow-auto no-scrollbar bg-white/20 backdrop-blur-md dark:bg-[#2a2a2a] text-foreground">
           {children}
         </div>
       </div>
