@@ -22,18 +22,6 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   settings: SettingsWindow,
 };
 
-// Predefined wallpapers
-const WALLPAPERS = [
-  { id: 'default', gradient: 'from-[#0078d4] to-[#1084d7]', name: 'Windows Blue' },
-  { id: 'dark', gradient: 'from-[#1a1a1a] to-[#2d2d2d]', name: 'Dark' },
-  { id: 'purple', gradient: 'from-[#667eea] to-[#764ba2]', name: 'Purple Dream' },
-  { id: 'sunset', gradient: 'from-[#ff6b6b] to-[#feca57]', name: 'Sunset' },
-  { id: 'ocean', gradient: 'from-[#2193b0] to-[#6dd5ed]', name: 'Ocean' },
-  { id: 'forest', gradient: 'from-[#134e5e] to-[#71b280]', name: 'Forest' },
-  { id: 'rose', gradient: 'from-[#c94b4b] to-[#4b134f]', name: 'Rose' },
-  { id: 'sky', gradient: 'from-[#56ccf2] to-[#2f80ed]', name: 'Sky' },
-];
-
 export function Desktop() {
   const { state, dispatch } = useOS();
   const [showWallpaperMenu, setShowWallpaperMenu] = useState(false);

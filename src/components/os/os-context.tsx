@@ -20,6 +20,8 @@ export interface WindowState {
   size: { width: number; height: number };
   zIndex: number;
   showFrame?: boolean;
+  prevPosition?: { x: number; y: number };
+  prevSize?: { width: number; height: number };
 }
 
 export interface OSState {
@@ -179,22 +181,32 @@ function osReducer(state: OSState, action: OSAction): OSState {
         ),
       };
 
-    case 'MAXIMIZE_WINDOW':
+    case 'MAXIMIZE_WINDOW': {
       return {
         ...state,
-        windows: state.windows.map((w) =>
-          w.id === action.payload
-            ? {
+        windows: state.windows.map((w) => {
+          if (w.id !== action.payload) return w;
+
+          if (w.isMaximized) {
+            // 👈 restore
+            return {
               ...w,
-              isMaximized: !w.isMaximized,
-              position: w.isMaximized ? { x: w.position.x, y: w.position.y } : { x: 0, y: 0 },
-              size: w.isMaximized
-                ? { ...w.size }
-                : { width: window.innerWidth, height: window.innerHeight - 48 },
-            }
-            : w
-        ),
+              isMaximized: false,
+              position: w.prevPosition!,
+              size: w.prevSize!,
+            };
+          }
+
+          // 👈 maximize
+          return {
+            ...w,
+            isMaximized: true,
+            prevPosition: w.position,
+            prevSize: w.size,
+          };
+        }),
       };
+    }
 
     case 'FOCUS_WINDOW':
       return {
