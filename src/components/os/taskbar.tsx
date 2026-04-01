@@ -1,16 +1,23 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOS } from './os-context';
-import { Wifi, Volume2, Grid2x2 } from 'lucide-react';
+import { Inbox as InboxComponent } from '../ui/inbox';
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+} from '../ui/context-menu';
+import { Wifi, Volume2, Inbox } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import WindowLogo from '../../assets/Window-Logo.png';
 
-// Lazy load FluidFire component
+// Lazy load FluidFire
 const FluidFire = dynamic(() => import('../ui/fluid-fire').then(mod => mod.FluidFire), {
   ssr: false,
-  loading: () => <div className="w-full h-full" />
+  loading: () => <div className="w-full h-full" />,
 });
 
 export function Taskbar() {
@@ -18,14 +25,11 @@ export function Taskbar() {
   const [time, setTime] = useState('');
   const [fireWidth, setFireWidth] = useState(800);
   const [isMounted, setIsMounted] = useState(false);
-  const [contextMenuOpen, setContextMenuOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<{
-    x: number;
-    y?: number;
-    bottom?: number;
-  }>({ x: 0, y: 0 });
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [inboxOpen, setIsInboxOpen] = useState(false);
+  const [isHoveringBottom, setIsHoveringBottom] = useState(false);
 
+  // resize fire
   useEffect(() => {
     const updateFireWidth = () => {
       const width = window.innerWidth > 2560
@@ -41,6 +45,7 @@ export function Taskbar() {
     return () => window.removeEventListener('resize', updateFireWidth);
   }, []);
 
+  // time
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -50,36 +55,32 @@ export function Taskbar() {
       });
       setTime(formatted);
     };
+
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setContextMenuOpen(false);
-      }
-    };
+  const hasMaximizedWindow = state.windows.some(
+    (w) => w.isOpen && w.isMaximized
+  );
 
-    if (contextMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+  const shouldHide = hasMaximizedWindow && !isHoveringBottom;
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [contextMenuOpen]);
+  const handleRightClick = () => {
+    setOpen(false); // close trước
+
+    requestAnimationFrame(() => {
+      setOpen(true); // open lại → update position
+    });
+  };
 
   const handleCloseAllWindows = () => {
-    // Đóng tất cả windows đang mở
     state.windows
       .filter((w) => w.isOpen)
       .forEach((window) => {
         dispatch({ type: 'CLOSE_WINDOW', payload: window.id });
       });
-
-    setContextMenuOpen(false);
   };
 
   const openWindows = state.windows.filter((w) => w.isOpen);
@@ -106,178 +107,143 @@ export function Taskbar() {
         borderRadius: '0px',
         overflow: 'hidden',
       },
-    }
-  };
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    const menuWidth = 280;
-    const menuHeight = 200;
-    const taskbarHeight = 48;
-
-    let x = e.clientX;
-    if (x + menuWidth > window.innerWidth) {
-      x = window.innerWidth - menuWidth - 10;
-    }
-
-    const distanceFromBottom = window.innerHeight - e.clientY;
-
-    if (distanceFromBottom < menuHeight + taskbarHeight) {
-      setMenuPosition({
-        x,
-        bottom: window.innerHeight - e.clientY,
-      });
-    } else {
-      setMenuPosition({
-        x,
-        y: e.clientY,
-      });
-    }
-
-    setContextMenuOpen(true);
+    },
   };
 
   return (
     <>
-      {/* Fire Effect Container */}
+      {/* Hover detect zone */}
       <div
-        className="fixed left-0 right-0 pointer-events-none z-[1] bg-transparent"
-        style={{
-          bottom: '0px',
-          height: '63px',
-          width: '100%',
-        }}
+        className="fixed bottom-0 left-0 right-0 z-[1]"
+        style={{ height: '40px', pointerEvents: 'none' }}
+      >
+        <div
+          onMouseEnter={() => setIsHoveringBottom(true)}
+          className="w-full h-full"
+          style={{ pointerEvents: 'auto' }}
+        />
+      </div>
+
+      {/* Fire */}
+      <div
+        className="fixed left-0 right-0 pointer-events-none z-[1]"
+        style={{ bottom: '0px', height: '63px' }}
       >
         {isMounted && (
-          <div style={{
-            width: '100%',
-            height: '100%',
-          }}>
-            <FluidFire
-              {...config.config}
-              interactive={false}
-              backgroundColor='transparent'
-              style={config.style.canvas}
-            />
-          </div>
+          <FluidFire
+            {...config.config}
+            interactive={false}
+            backgroundColor="transparent"
+            style={config.style.canvas}
+          />
         )}
       </div>
 
-      {/* Taskbar */}
-      <div
-        className="fixed bottom-0 left-0 right-0 h-12 flex items-center justify-between px-2 z-[9999]"
-        onContextMenu={handleContextMenu}
-      >
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_START_MENU' })}
-            className={`h-10 w-12 flex items-center justify-center hover:bg-white/10 transition ${state.startMenuOpen ? 'bg-white/10' : ''
-              }`}
+      {/* Context Menu wrapper */}
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          {/* Taskbar */}
+          <div
+            className={`fixed bottom-0 left-0 right-0 h-12 flex items-center justify-between px-2 z-[9999]
+              transition-all duration-300
+              ${shouldHide ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+            `}
+            style={{
+              pointerEvents: shouldHide ? 'none' : 'auto',
+            }}
+            onContextMenu={handleRightClick}
+            onMouseLeave={() => setIsHoveringBottom(false)}
           >
-            <Image
-              src={WindowLogo}
-              alt="Start"
-              width={27}
-              height={27}
-              className="text-white"
-            />
-          </button>
-
-          <div className="flex items-center ml-1">
-            {openWindows.map((window) => (
+            {/* LEFT */}
+            <div className="flex items-center gap-1">
               <button
-                key={window.id}
-                onClick={() => {
-                  if (window.isMinimized) {
-                    dispatch({ type: 'MINIMIZE_WINDOW', payload: window.id });
-                  } else {
-                    dispatch({ type: 'FOCUS_WINDOW', payload: window.id });
-                  }
-                }}
-                className={`relative h-10 w-12 flex items-center justify-center hover:bg-white/10 transition`}
-                title={window.title}
+                onClick={() => dispatch({ type: 'TOGGLE_START_MENU' })}
+                className={`h-10 w-12 flex items-center justify-center hover:bg-white/10 ${state.startMenuOpen ? 'bg-white/10' : ''
+                  }`}
               >
-                {typeof window.icon === 'object' ? (
-                  <Image
-                    src={window.icon}
-                    alt={window.title}
-                    width={27}
-                    height={27}
-                    className="pointer-events-none"
-                  />
-                ) : (
-                  <div className="text-xl select-none">{window.icon}</div>
-                )}
-
-                {/* ACTIVE INDICATOR */}
-                {!window.isMinimized && (
-                  <div className="absolute bottom-0 w-6 h-[3px] bg-[#0078d4] rounded"></div>
-                )}
+                <Image src={WindowLogo} alt="Start" width={27} height={27} />
               </button>
-            ))}
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 text-white/80 text-sm">
-          <button className="h-10 w-10 flex items-center justify-center hover:bg-white/10">
-            <Wifi size={16} />
-          </button>
+              <div className="flex items-center ml-1">
+                {openWindows.map((window) => (
+                  <button
+                    key={window.id}
+                    onClick={() => {
+                      if (window.isMinimized) {
+                        dispatch({ type: 'MINIMIZE_WINDOW', payload: window.id });
+                      } else {
+                        dispatch({ type: 'FOCUS_WINDOW', payload: window.id });
+                      }
+                    }}
+                    className="relative h-10 w-12 flex items-center justify-center hover:bg-white/10"
+                  >
+                    {typeof window.icon === 'object' ? (
+                      <Image src={window.icon} alt="" width={27} height={27} />
+                    ) : (
+                      <div>{window.icon}</div>
+                    )}
 
-          <button className="h-10 w-10 flex items-center justify-center hover:bg-white/10">
-            <Volume2 size={16} />
-          </button>
-
-          <div className="px-3 text-xs leading-tight text-right min-w-[3rem]">
-            <div>{time || '00:00'}</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Context Menu */}
-      {contextMenuOpen && (
-        <div
-          ref={menuRef}
-          className="fixed bg-white/95 dark:bg-[#2a2a2a]/95 backdrop-blur-lg border border-[#d0d0d0] dark:border-[#404040] shadow-2xl rounded-lg overflow-hidden z-[20000] min-w-[280px]"
-          style={{
-            left: `${menuPosition.x}px`,
-            ...(menuPosition.bottom !== undefined
-              ? { bottom: `${menuPosition.bottom}px` }
-              : { top: `${menuPosition.y}px` }
-            ),
-          }}
-        >
-          <div className="py-2">
-            <div className="px-4 py-2 text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase">
-              Taskbar settings
+                    {!window.isMinimized && (
+                      <div className="absolute bottom-0 w-6 h-[3px] bg-white/80 rounded" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <button
-              onClick={() => {
+            {/* RIGHT */}
+            <div className="flex items-center gap-2 text-white/80 text-sm">
+              <button className="h-10 w-10 flex items-center justify-center hover:bg-white/10">
+                <Wifi size={16} />
+              </button>
 
-                setContextMenuOpen(false);
-              }}
-              className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 transition-colors text-left"
-            >
-              <span className="text-xl">⚙️</span>
-              <span className="text-sm">Taskbar settings</span>
-            </button>
+              <button className="h-10 w-10 flex items-center justify-center hover:bg-white/10">
+                <Volume2 size={16} />
+              </button>
 
-            <div className="border-t border-[#d0d0d0] dark:border-[#404040] my-2" />
+              <div className="px-3 text-xs text-right">
+                {time || '00:00'}
+              </div>
 
-            <button
-              onClick={() => {
-                handleCloseAllWindows();
-                setContextMenuOpen(false);
-              }}
-              className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 transition-colors text-left"
-            >
-              <span className="text-xl">❌</span>
-              <span className="text-sm">Close all windows</span>
-            </button>
+              <div
+                className="px-2 cursor-pointer"
+                onClick={() => setIsInboxOpen(!inboxOpen)}
+              >
+                <Inbox size={16} />
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        </ContextMenuTrigger>
+
+        {/* Context Menu */}
+        <ContextMenuContent
+          className="
+            bg-white/95 dark:bg-[#2a2a2a]/95 
+            backdrop-blur-lg 
+            border border-[#d0d0d0] dark:border-[#404040] 
+            shadow-2xl 
+            rounded
+            min-w-[220px]
+            mb-2
+          "
+        >
+          <ContextMenuItem onClick={handleCloseAllWindows} className="gap-3">
+            <span className="w-5" />
+            Close all windows
+          </ContextMenuItem>
+
+          <ContextMenuItem
+            onClick={() => dispatch({ type: 'OPEN_WINDOW', payload: 'settings' })}
+            className="gap-3"
+          >
+            <span className="w-5 flex justify-center">⚙️</span>
+            Taskbar settings
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+
+      {/* Inbox */}
+      <InboxComponent visible={inboxOpen} setVisible={setIsInboxOpen} />
     </>
   );
 }

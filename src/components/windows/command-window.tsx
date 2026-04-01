@@ -60,7 +60,7 @@ Available kinjutsu:
 
     return (
         <div
-            className="bg-black text-red-400 font-mono text-sm h-full w-full overflow-auto p-1"
+            className="bg-black/70 text-red-400 font-mono text-sm h-full w-full overflow-auto p-1"
             onClick={() => inputRef.current?.focus()}
         >
             {/* History */}

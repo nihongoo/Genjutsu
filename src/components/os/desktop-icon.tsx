@@ -29,9 +29,8 @@ export function DesktopIcon({ id, label, icon }: DesktopIconProps) {
         <Image
           src={icon}
           alt={label}
-          width={50}
-          height={50}
-          className="pointer-events-none"
+
+          className="pointer-events-none w-12 h-12 object-contain"
         />
       ) : (
         <div className="text-5xl select-none">{icon}</div>

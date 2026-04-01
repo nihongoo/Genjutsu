@@ -2,6 +2,8 @@ import ThisPC from '../assets/this-pc.png';
 import Commands from '../assets/commands.png';
 import Chrome from '../assets/Chrome.png';
 import Spotify from '../assets/Spotify.png';
+import Settings from '../assets/Setting.svg';
+import Project from '../assets/Project.png';
 export interface AppConfig {
   id: string;
   label: string;
@@ -17,12 +19,11 @@ export interface AppConfig {
  */
 export const APPS_CONFIG: AppConfig[] = [
   { id: 'about', label: 'About Me', icon: ThisPC },
-  { id: 'skills', label: 'Skills', icon: '⚙️' },
-  { id: 'projects', label: 'Projects', icon: '📁' },
+  { id: 'projects', label: 'Projects', icon: Project },
   { id: 'chrome', label: 'Chrome', icon: Chrome },
-  { id: 'resume', label: 'Resume', icon: '📄' },
   { id: 'commands', label: 'Commands', icon: Commands },
   { id: 'spotify', label: 'Spotify', icon: Spotify },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 /**
