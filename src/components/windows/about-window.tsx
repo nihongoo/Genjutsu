@@ -8,8 +8,8 @@ export function AboutWindow() {
           👤
         </div>
         <div className="flex-1">
-          <h2 className="text-2xl font-bold text-foreground">Welcome to My Portfolio</h2>
-          <p className="text-muted-foreground mt-2">
+          <h2 className="text-2xl font-bold text-white/80 dark:text-white/80">Welcome to My Portfolio</h2>
+          <p className="mt-2 text-white/80 dark:text-white/80">
             I'm a passionate developer with expertise in building modern web applications. 
             This portfolio is built as a Windows 10 OS simulator to showcase my skills and projects.
           </p>
@@ -17,11 +17,11 @@ export function AboutWindow() {
       </div>
 
       <div className="border-t border-[#d0d0d0] dark:border-[#404040] pt-4">
-        <h3 className="font-semibold text-foreground mb-3">About Me</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">
+        <h3 className="font-semibold text-white/80 dark:text-white/80] mb-3">About Me</h3>
+        <p className="text-sm text-white/80 dark:text-white/80 leading-relaxed">
           With over 5 years of experience in web development, I specialize in:
         </p>
-        <ul className="text-sm text-muted-foreground mt-3 space-y-2 list-disc list-inside">
+        <ul className="text-sm text-white/80 dark:text-white/80 mt-3 space-y-2 list-disc list-inside">
           <li>Frontend Development (React, Vue, Next.js)</li>
           <li>Backend Development (Node.js, Python, TypeScript)</li>
           <li>UI/UX Design and Implementation</li>
@@ -31,8 +31,8 @@ export function AboutWindow() {
       </div>
 
       <div className="border-t border-[#d0d0d0] dark:border-[#404040] pt-4">
-        <h3 className="font-semibold text-foreground mb-2">Contact Info</h3>
-        <div className="text-sm text-muted-foreground space-y-1">
+        <h3 className="font-semibold text-white/80 dark:text-white/80 mb-2">Contact Info</h3>
+        <div className="text-sm text-white/80 dark:text-white/80 space-y-1">
           <p>📧 Email: your.email@example.com</p>
           <p>🔗 LinkedIn: linkedin.com/in/yourprofile</p>
           <p>💻 GitHub: github.com/yourprofile</p>

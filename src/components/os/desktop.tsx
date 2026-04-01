@@ -5,23 +5,21 @@ import { useOS } from './os-context';
 import { DesktopIcon } from './desktop-icon';
 import { Window } from './window';
 import { AboutWindow } from '../windows/about-window';
-import { SkillsWindow } from '../windows/skills-window';
 import { ProjectsWindow } from '../windows/projects-window';
-import { ResumeWindow } from '../windows/resume-window';
 import { CommandsWindow } from '../windows/command-window';
 import { ChromeWindow } from '../windows/chrome-window';
 import { SpotifyWindow } from '../windows/spotify-window';
+import { SettingsWindow } from '../windows/setting-window';
 import { VideoWallpaper } from './video-wallpaper';
 import { APPS_CONFIG } from '../../config/apps-config';
 
 const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   about: AboutWindow,
-  skills: SkillsWindow,
   projects: ProjectsWindow,
   chrome: ChromeWindow,
-  resume: ResumeWindow,
   commands: CommandsWindow,
   spotify: SpotifyWindow,
+  settings: SettingsWindow,
 };
 
 // Predefined wallpapers
@@ -71,6 +69,11 @@ export function Desktop() {
     setShowWallpaperMenu(false);
   };
 
+  const handleOpenSettings = () => {
+    dispatch({ type: 'OPEN_WINDOW', payload: 'settings' });
+    setShowWallpaperMenu(false);
+  }
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -101,41 +104,6 @@ export function Desktop() {
 
     setMenuPosition({ x, y });
     setShowWallpaperMenu(true);
-  };
-
-  const handleWallpaperChange = (wallpaper: typeof WALLPAPERS[0]) => {
-    dispatch({
-      type: 'SET_WALLPAPER',
-      payload: {
-        type: 'gradient',
-        value: wallpaper.gradient,
-        name: wallpaper.name,
-      },
-    });
-    setShowWallpaperMenu(false);
-  };
-
-  const handleCustomWallpaper = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      dispatch({
-        type: 'SET_WALLPAPER',
-        payload: {
-          type: 'custom',
-          value: event.target?.result as string,
-          name: file.name,
-        },
-      });
-
-      setShowWallpaperMenu(false);
-    };
-
-    reader.readAsDataURL(file);
   };
 
   return (
@@ -193,6 +161,7 @@ export function Desktop() {
               isMinimized={windowState.isMinimized}
               isMaximized={windowState.isMaximized}
               zIndex={windowState.zIndex}
+              showFrame={windowState.showFrame ?? true} // 👈 thêm dòng này
             >
               <WindowComponent />
             </Window>
@@ -218,46 +187,16 @@ export function Desktop() {
 
             <div className="border-t border-[#d0d0d0] dark:border-[#404040] my-2" />
 
-            {/* Upload custom wallpaper */}
-            <label className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 cursor-pointer transition-colors">
-              <span className="text-2xl">🖼️</span>
-              <span className="text-sm">Browse for image...</span>
-
-              <input
-                type="file"
-                accept="image/*,video/mp4,video/webm"
-                onChange={handleCustomWallpaper}
-                className="hidden"
-              />
-
-              {state.wallpaper.type === 'custom' && (
-                <span className="ml-auto text-blue-500">✓</span>
-              )}
-            </label>
-
-            <div className="border-t border-[#d0d0d0] dark:border-[#404040] my-2" />
-
             {/* Reset to Default */}
             <button
               onClick={() => {
-                dispatch({
-                  type: 'SET_WALLPAPER',
-                  payload: {
-                    type: 'video',
-                    value: 'background.mp4',
-                    name: 'Windows Blue',
-                  },
-                });
+                dispatch({ type: 'OPEN_WINDOW', payload: 'settings' });
                 setShowWallpaperMenu(false);
               }}
               className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 transition-colors"
             >
               <span className="text-xl">🔄</span>
-              <span className="text-sm font-medium">Reset to Default</span>
-              {state.wallpaper.type === 'video' &&
-                state.wallpaper.value === 'background.mp4' && (
-                  <span className="ml-auto text-green-500">●</span>
-                )}
+              <span className="text-sm font-medium">Settings</span>
             </button>
           </div>
         </div>
