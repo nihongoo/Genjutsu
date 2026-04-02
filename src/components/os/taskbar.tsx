@@ -1,17 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOS } from './os-context';
 import { Inbox as InboxComponent } from '../ui/inbox';
-import {
-  ContextMenu,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuItem,
-} from '../ui/context-menu';
 import { Wifi, Volume2, Inbox } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import { ContextMenu } from '@base-ui/react/context-menu';
 import WindowLogo from '../../assets/Window-Logo.png';
 
 // Lazy load FluidFire
@@ -25,7 +20,6 @@ export function Taskbar() {
   const [time, setTime] = useState('');
   const [fireWidth, setFireWidth] = useState(800);
   const [isMounted, setIsMounted] = useState(false);
-  const [open, setOpen] = useState(false);
   const [inboxOpen, setIsInboxOpen] = useState(false);
   const [isHoveringBottom, setIsHoveringBottom] = useState(false);
 
@@ -67,20 +61,16 @@ export function Taskbar() {
 
   const shouldHide = hasMaximizedWindow && !isHoveringBottom;
 
-  const handleRightClick = () => {
-    setOpen(false); // close trước
-
-    requestAnimationFrame(() => {
-      setOpen(true); // open lại → update position
-    });
-  };
-
   const handleCloseAllWindows = () => {
     state.windows
       .filter((w) => w.isOpen)
       .forEach((window) => {
         dispatch({ type: 'CLOSE_WINDOW', payload: window.id });
       });
+  };
+
+  const handleOpenSettings = () => {
+    dispatch({ type: 'OPEN_WINDOW', payload: 'settings' });
   };
 
   const openWindows = state.windows.filter((w) => w.isOpen);
@@ -139,19 +129,17 @@ export function Taskbar() {
         )}
       </div>
 
-      {/* Context Menu wrapper */}
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          {/* Taskbar */}
+      <ContextMenu.Root>
+        <ContextMenu.Trigger className="flex h-[12rem] w-[15rem] items-center justify-center select-none">
+
           <div
             className={`fixed bottom-0 left-0 right-0 h-12 flex items-center justify-between px-2 z-[9999]
-              transition-all duration-300
-              ${shouldHide ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
-            `}
+          transition-all duration-300
+          ${shouldHide ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+        `}
             style={{
               pointerEvents: shouldHide ? 'none' : 'auto',
             }}
-            onContextMenu={handleRightClick}
             onMouseLeave={() => setIsHoveringBottom(false)}
           >
             {/* LEFT */}
@@ -213,37 +201,35 @@ export function Taskbar() {
               </div>
             </div>
           </div>
-        </ContextMenuTrigger>
 
-        {/* Context Menu */}
-        <ContextMenuContent
-          className="
-            bg-white/95 dark:bg-[#2a2a2a]/95 
-            backdrop-blur-lg 
-            border border-[#d0d0d0] dark:border-[#404040] 
-            shadow-2xl 
-            rounded
-            min-w-[220px]
-            mb-2
-          "
-        >
-          <ContextMenuItem onClick={handleCloseAllWindows} className="gap-3">
-            <span className="w-5" />
-            Close all windows
-          </ContextMenuItem>
+        </ContextMenu.Trigger>
 
-          <ContextMenuItem
-            onClick={() => dispatch({ type: 'OPEN_WINDOW', payload: 'settings' })}
-            className="gap-3"
-          >
-            <span className="w-5 flex justify-center">⚙️</span>
-            Taskbar settings
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-
-      {/* Inbox */}
-      <InboxComponent visible={inboxOpen} setVisible={setIsInboxOpen} />
+        {/* Inbox */}
+        <InboxComponent visible={inboxOpen} setVisible={setIsInboxOpen} />
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner
+            positionMethod="fixed"
+            side="right" 
+            align="start" 
+            sideOffset={4}
+            alignOffset={0}
+            sticky={true}
+            className="outline-hidden z-[99999]">
+            <ContextMenu.Popup className="origin-[var(--transform-origin)] backdrop-blur-md bg-white/20 py-1 text-[#FA5252] dark:text-[#FA5252] border rounded border-gray-200 dark:border-gray-700 transition-[opacity] data-[ending-style]:opacity-0">
+              <ContextMenu.Item 
+              className="flex cursor-default py-2 pr-8 pl-4 text-sm hover:bg-black/20 dark:hover:bg-[#3a3a3a] transition"
+              onClick={handleCloseAllWindows}>
+                Close All Windows
+              </ContextMenu.Item>
+              <ContextMenu.Item 
+              className="flex cursor-default py-2 pr-8 pl-4 text-sm hover:bg-black/20 dark:hover:bg-[#3a3a3a] transition"
+              onClick={handleOpenSettings}>
+                Open Setting
+              </ContextMenu.Item>
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
     </>
   );
 }
