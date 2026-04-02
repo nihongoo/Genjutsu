@@ -25,10 +25,12 @@ export function ContextMenu({ items, position, menuRef }: ContextMenuProps) {
       className="fixed bg-white/95 dark:bg-[#2a2a2a]/95 backdrop-blur-lg border border-[#d0d0d0] dark:border-[#404040] shadow-2xl rounded-lg overflow-hidden z-[20000] min-w-[220px]"
       style={{
         left: `${position.x}px`,
+        // ✅ Dùng bottom nếu có, nếu không thì dùng top
         ...(position.bottom !== undefined
           ? { bottom: `${position.bottom}px` }
           : { top: `${position.y}px` }),
       }}
+      onClick={(e) => e.stopPropagation()} // ✅ Prevent event bubbling
     >
       <div className="py-1">
         {items.map((item, index) => (
@@ -38,9 +40,14 @@ export function ContextMenu({ items, position, menuRef }: ContextMenuProps) {
             className="w-full px-4 py-2 flex items-center gap-3 text-left text-sm hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] transition-colors"
           >
             {/* icon */}
-            <span className="w-5 flex justify-center">
-              {item.icon ?? <span className="w-5" />} 
-            </span>
+            {item.icon && (
+              <span className="w-5 flex justify-center text-base">
+                {item.icon}
+              </span>
+            )}
+            
+            {/* ✅ Nếu không có icon thì vẫn cần spacing */}
+            {!item.icon && <span className="w-5" />}
 
             {/* label */}
             <span>{item.label}</span>

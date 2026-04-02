@@ -12,6 +12,7 @@ import { SpotifyWindow } from '../windows/spotify-window';
 import { SettingsWindow } from '../windows/setting-window';
 import { VideoWallpaper } from './video-wallpaper';
 import { APPS_CONFIG } from '../../config/apps-config';
+import { ContextMenu } from '@base-ui/react/context-menu';
 
 const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   about: AboutWindow,
@@ -24,171 +25,106 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
 
 export function Desktop() {
   const { state, dispatch } = useOS();
-  const [showWallpaperMenu, setShowWallpaperMenu] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (!showWallpaperMenu || !menuRef.current) return;
-
-    const menu = menuRef.current;
-    const { offsetWidth, offsetHeight } = menu;
-
-    let x = menuPosition.x;
-    let y = menuPosition.y;
-
-    if (x + offsetWidth > window.innerWidth) {
-      x = window.innerWidth - offsetWidth - 8;
-    }
-
-    if (y + offsetHeight > window.innerHeight) {
-      y = window.innerHeight - offsetHeight - 8;
-    }
-
-    if (x !== menuPosition.x || y !== menuPosition.y) {
-      setMenuPosition({ x, y });
-    }
-  }, [showWallpaperMenu]);
 
   const handleDesktopClick = () => {
     if (state.startMenuOpen) {
       dispatch({ type: 'CLOSE_START_MENU' });
     }
-    setShowWallpaperMenu(false);
   };
 
   const handleOpenSettings = () => {
     dispatch({ type: 'OPEN_WINDOW', payload: 'settings' });
-    setShowWallpaperMenu(false);
-  }
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    const padding = 8;
-
-    let x = e.clientX;
-    let y = e.clientY;
-
-    // 👉 Lấy size thật của menu
-    const menu = menuRef.current;
-    if (menu) {
-      const { offsetWidth, offsetHeight } = menu;
-
-      // fix tràn phải
-      if (x + offsetWidth > window.innerWidth) {
-        x = x - offsetWidth;
-      }
-
-      // fix tràn dưới
-      if (y + offsetHeight > window.innerHeight) {
-        y = y - offsetHeight;
-      }
-    }
-
-    // fix tràn trái / trên
-    if (x < padding) x = padding;
-    if (y < padding) y = padding;
-
-    setMenuPosition({ x, y });
-    setShowWallpaperMenu(true);
   };
 
   return (
     <>
-      <div
-        onClick={handleDesktopClick}
-        onContextMenu={handleContextMenu}
-        className="fixed inset-0 w-full h-full overflow-hidden"
-        style={
-          state.wallpaper.type === 'custom'
-            ? {
-              backgroundImage: `url(${state.wallpaper.value})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }
-            : {}
-        }
-      >
-        {state.wallpaper.type === 'video' && (
-          <VideoWallpaper src={state.wallpaper.value} />
-        )}
-        {/* Gradient wallpaper */}
-        {state.wallpaper.type === 'gradient' && (
+      <ContextMenu.Root>
+        <ContextMenu.Trigger className="flex h-[12rem] w-[15rem] z-0 select-none">
           <div
-            className={`absolute inset-0 bg-gradient-to-br ${state.wallpaper.value} opacity-70`}
-          />
-        )}
+            onClick={handleDesktopClick}
+            className="fixed inset-0 w-full h-full overflow-hidden"
+            style={
+              state.wallpaper.type === 'custom'
+                ? {
+                  backgroundImage: `url(${state.wallpaper.value})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
+                : {}
+            }
+          >
+            {state.wallpaper.type === 'video' && (
+              <VideoWallpaper src={state.wallpaper.value} />
+            )}
 
-        {/* Desktop Icons - RESPONSIVE VERSION */}
-        <div className="p-4 absolute top-0 left-0 bottom-12 flex flex-col flex-wrap gap-3 z-1 content-start max-h-[calc(100vh-2.5rem)]">
-          {APPS_CONFIG.map((item) => (
-            <DesktopIcon
-              key={item.id}
-              id={item.id}
-              label={item.label}
-              icon={item.icon}
-            />
-          ))}
-        </div>
+            {/* Gradient wallpaper */}
+            {state.wallpaper.type === 'gradient' && (
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${state.wallpaper.value} opacity-70`}
+              />
+            )}
 
-        {/* Windows */}
-        {state.windows.map((windowState) => {
-          const WindowComponent = WINDOW_COMPONENTS[windowState.id];
-
-          if (!WindowComponent || !windowState.isOpen) return null;
-
-          return (
-            <Window
-              key={windowState.id}
-              id={windowState.id}
-              title={windowState.title}
-              icon={windowState.icon}
-              position={windowState.position}
-              size={windowState.size}
-              isMinimized={windowState.isMinimized}
-              isMaximized={windowState.isMaximized}
-              zIndex={windowState.zIndex}
-              showFrame={windowState.showFrame ?? true} // 👈 thêm dòng này
-            >
-              <WindowComponent />
-            </Window>
-          );
-        })}
-      </div>
-
-      {/* Context Menu */}
-      {showWallpaperMenu && (
-        <div
-          ref={menuRef}
-          className="fixed bg-white/95 dark:bg-[#2a2a2a]/95 backdrop-blur-lg border border-[#d0d0d0] dark:border-[#404040] shadow-2xl rounded-lg overflow-hidden z-[20000] min-w-[280px]"
-          style={{
-            left: `${menuPosition.x}px`,
-            top: `${menuPosition.y}px`,
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="py-2">
-            <div className="px-4 py-2 text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase">
-              Personalize
+            {/* Desktop Icons */}
+            <div className="p-4 absolute top-0 left-0 bottom-12 flex flex-col flex-wrap gap-3 z-1 content-start max-h-[calc(100vh-2.5rem)]">
+              {APPS_CONFIG.map((item) => (
+                <DesktopIcon
+                  key={item.id}
+                  id={item.id}
+                  label={item.label}
+                  icon={item.icon}
+                />
+              ))}
             </div>
-
-            <div className="border-t border-[#d0d0d0] dark:border-[#404040] my-2" />
-
-            {/* Reset to Default */}
-            <button
-              onClick={() => {
-                dispatch({ type: 'OPEN_WINDOW', payload: 'settings' });
-                setShowWallpaperMenu(false);
-              }}
-              className="w-full px-4 py-2 hover:bg-[#e0e0e0] dark:hover:bg-[#3a3a3a] flex items-center gap-3 transition-colors"
-            >
-              <span className="text-xl">🔄</span>
-              <span className="text-sm font-medium">Settings</span>
-            </button>
           </div>
-        </div>
-      )}
+
+          {/* Base UI Context Menu */}
+
+        </ContextMenu.Trigger>
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner
+            positionMethod="fixed"    
+            side="right"            
+            align="start"            
+            sideOffset={4}         
+            alignOffset={0}
+            sticky={true}
+            className="outline-hidden">
+            <ContextMenu.Popup className="origin-[var(--transform-origin)] w-60 backdrop-blur-md bg-white/20 py-1 text-[#FA5252] dark:text-[#FA5252] border rounded border-gray-200 dark:border-gray-700 transition-[opacity] data-[ending-style]:opacity-0">
+              <div className="p-2">
+                <ContextMenu.Item
+                  className="flex cursor-default py-2 pr-8 pl-4 text-sm hover:bg-black/20 dark:hover:bg-[#3a3a3a] transition"
+                  onSelect={handleOpenSettings}
+                >
+                  <span>Settings</span>
+                </ContextMenu.Item>
+              </div>
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
+      {/* Windows */}
+      {state.windows.map((windowState) => {
+        const WindowComponent = WINDOW_COMPONENTS[windowState.id];
+
+        if (!WindowComponent || !windowState.isOpen) return null;
+
+        return (
+          <Window
+            key={windowState.id}
+            id={windowState.id}
+            title={windowState.title}
+            icon={windowState.icon}
+            position={windowState.position}
+            size={windowState.size}
+            isMinimized={windowState.isMinimized}
+            isMaximized={windowState.isMaximized}
+            zIndex={windowState.zIndex}
+            showFrame={windowState.showFrame ?? true}
+          >
+            <WindowComponent />
+          </Window>
+        );
+      })}
     </>
   );
 }
