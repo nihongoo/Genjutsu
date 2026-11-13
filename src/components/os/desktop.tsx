@@ -1,27 +1,12 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useOS } from './os-context';
 import { DesktopIcon } from './desktop-icon';
 import { Window } from './window';
-import { AboutWindow } from '../windows/about-window';
-import { ProjectsWindow } from '../windows/projects-window';
-import { CommandsWindow } from '../windows/command-window';
-import { ChromeWindow } from '../windows/chrome-window';
-import { SpotifyWindow } from '../windows/spotify-window';
-import { SettingsWindow } from '../windows/setting-window';
 import { VideoWallpaper } from './video-wallpaper';
 import { APPS_CONFIG } from '../../config/apps-config';
+import { WINDOW_COMPONENTS } from '../../config/app-components';
 import { ContextMenu } from '@base-ui/react/context-menu';
-
-const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
-  about: AboutWindow,
-  projects: ProjectsWindow,
-  chrome: ChromeWindow,
-  commands: CommandsWindow,
-  spotify: SpotifyWindow,
-  settings: SettingsWindow,
-};
 
 export function Desktop() {
   const { state, dispatch } = useOS();
