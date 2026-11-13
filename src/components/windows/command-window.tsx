@@ -20,6 +20,17 @@ export function CommandsWindow() {
         let output = '';
 
         switch (args) {
+            case 'help':
+                output = `
+Available commands:
+- kinjutsu
+- izanagi
+- izanami
+- kotoamatsukami
+- cls
+        `;
+                break;
+
             case 'kinjutsu':
                 output = `
 Available kinjutsu:
