@@ -71,7 +71,9 @@ function osReducer(state: OSState, action: OSAction): OSState {
         return {
           ...state,
           windows: state.windows.map((w) =>
-            w.id === action.payload ? { ...w, isOpen: true, isMinimized: false } : w
+            w.id === action.payload
+              ? { ...w, isOpen: true, isMinimized: false, zIndex: state.nextZIndex }
+              : w
           ),
           focusedWindowId: action.payload,
           nextZIndex: state.nextZIndex + 1,

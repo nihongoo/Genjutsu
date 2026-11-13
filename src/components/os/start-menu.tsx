@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useOS } from './os-context';
-import { Power, Settings, CircleUser } from 'lucide-react';
+import { Power, CircleUser } from 'lucide-react';
 import Image from 'next/image';
 import { APPS_CONFIG, PINNED_TILES } from '../../config/apps-config';
 
@@ -35,10 +35,10 @@ export function StartMenu() {
   if (!state.startMenuOpen) return null;
 
   return (
-    <div className="fixed bottom-12 left-0 w-[660px] bg-[#1a1a1a]/95 backdrop-blur-xl border-t border-white/10 shadow-2xl z-[10000] flex max-h-[600px] min-h-[600px]">
+    <div className="fixed bottom-12 left-0 w-[660px] max-w-[100vw] h-[min(600px,calc(100dvh-3rem))] max-h-[calc(100dvh-3rem)] bg-[#1a1a1a]/95 backdrop-blur-xl border-t border-white/10 shadow-2xl z-[10000] flex overflow-hidden">
 
       {/* LEFT SIDEBAR */}
-      <div className="w-12 bg-[#0a0a0a]/50 flex flex-col py-4 border-r border-white/5">
+      <div className="w-12 shrink-0 overflow-y-auto bg-[#0a0a0a]/50 flex flex-col py-4 border-r border-white/5">
 
         <button className="w-full h-12 flex items-center justify-center hover:bg-white/10 transition-colors text-white/70 hover:text-white">
           <span className="text-xl">≡</span>
@@ -59,10 +59,10 @@ export function StartMenu() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto min-[660px]:flex-row min-[660px]:overflow-hidden">
 
         {/* APP LIST */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="min-w-0 shrink-0 min-[660px]:flex-1 min-[660px]:overflow-y-auto p-4">
 
           {Object.entries(groupedApps).map(([letter, apps]) => (
             <div key={letter} className="mb-4">
@@ -105,7 +105,7 @@ export function StartMenu() {
         </div>
 
         {/* TILES AREA */}
-        <div className="w-[300px] p-4 border-l border-white/5">
+        <div className="w-full shrink-0 min-[660px]:w-[300px] p-4 border-l border-white/5">
 
           <div className="text-xs text-white/40 mb-2">
             Pinned
